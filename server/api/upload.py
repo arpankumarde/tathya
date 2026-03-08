@@ -6,7 +6,7 @@ from services import csv_ingester
 
 router = APIRouter()
 
-MAX_SIZE = 50 * 1024 * 1024  # 50 MB
+MAX_SIZE = 200 * 1024 * 1024  # 200 MB
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -20,7 +20,7 @@ async def upload_csv(file: UploadFile):
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
     if len(contents) > MAX_SIZE:
-        raise HTTPException(status_code=413, detail="File exceeds 50 MB limit")
+        raise HTTPException(status_code=413, detail="File exceeds 200 MB limit")
 
     try:
         result = await csv_ingester.ingest(contents, file.filename)
