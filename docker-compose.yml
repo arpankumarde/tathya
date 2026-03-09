@@ -1,0 +1,35 @@
+services:
+  frontend:
+    build:
+      context: ./client
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./client/.env
+    depends_on:
+      - backend
+    networks:
+      - tathya
+
+  backend:
+    build:
+      context: ./server
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./server/.env
+    environment:
+      - ALLOWED_ORIGINS=http://localhost:3000
+    volumes:
+      - upload_data:/app/data/uploads
+    networks:
+      - tathya
+
+volumes:
+  upload_data:
+
+networks:
+  tathya:
+    driver: bridge
