@@ -3,9 +3,9 @@ services:
     build:
       context: ./client
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://tathya.obvix.cloud}
     ports:
-      - "3000:3000"
+      - "3007:3000"
     env_file:
       - ./client/.env
     depends_on:
@@ -17,11 +17,9 @@ services:
     build:
       context: ./server
     ports:
-      - "8000:8000"
+      - "8007:8007"
     env_file:
       - ./server/.env
-    environment:
-      - ALLOWED_ORIGINS=http://localhost:3000
     volumes:
       - upload_data:/app/data/uploads
     networks:
