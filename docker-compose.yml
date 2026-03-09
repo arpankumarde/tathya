@@ -3,7 +3,7 @@ services:
     build:
       context: ./client
       args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://tathya.obvix.cloud}
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://tathya.api.obvix.cloud}
     ports:
       - "3007:3000"
     env_file:
