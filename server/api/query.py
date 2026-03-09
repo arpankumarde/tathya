@@ -128,7 +128,7 @@ async def _handle_sqlite_query(request: QueryRequest, session: dict, db_path: st
 
 @router.post("/query", response_model=QueryResponse)
 async def handle_query(request: QueryRequest):
-    session = await get_or_create_session(request.session_id)
+    session = await get_or_create_session(request.session_id, request.user_id)
 
     if request.dataset_id:
         db_path = get_dataset_path(request.dataset_id)

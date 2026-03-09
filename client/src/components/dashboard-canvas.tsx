@@ -1,7 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { Loader2, Sparkles, PlusCircle, X, GripVertical } from "lucide-react"
+import { Streamdown } from "streamdown"
+import { Loader2, Sparkles, PlusCircle, X, GripVertical, Download, ChevronDown } from "lucide-react"
 import {
     DndContext,
     closestCenter,
@@ -117,7 +118,7 @@ export function DashboardCanvas({ charts, summary, isLoading, columns, onRemove,
                     {summary && (
                         <div className="flex items-start gap-2.5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 shrink-0">
                             <Sparkles className="size-4 text-emerald-500 shrink-0 mt-0.5" />
-                            <p className="text-[12px] text-zinc-600 dark:text-zinc-300 leading-relaxed">{summary}</p>
+                            <div className="text-[12px] text-zinc-600 dark:text-zinc-300 leading-relaxed"><Streamdown>{summary}</Streamdown></div>
                         </div>
                     )}
 
@@ -144,12 +145,38 @@ export function DashboardCanvas({ charts, summary, isLoading, columns, onRemove,
     )
 }
 
+// ── Download helper ───────────────────────────────────────────────────────────
+
+async function downloadChartElement(el: HTMLElement, filename: string, format: "png" | "jpg") {
+    const { toPng, toJpeg } = await import("html-to-image")
+    const opts = { backgroundColor: "#ffffff", pixelRatio: 2 }
+    const dataUrl = format === "jpg" ? await toJpeg(el, opts) : await toPng(el, opts)
+    const link = document.createElement("a")
+    link.download = `${filename}.${format === "jpg" ? "jpg" : "png"}`
+    link.href = dataUrl
+    link.click()
+}
+
 // ── Sortable wrapper ──────────────────────────────────────────────────────────
 
 function SortableChartCard({ chart, onRemove }: { chart: ChartInstance; onRemove: (id: string) => void }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
         id: chart.instanceId,
     })
+    const cardRef = React.useRef<HTMLDivElement>(null)
+    const [fmtOpen, setFmtOpen] = React.useState(false)
+    const [downloading, setDownloading] = React.useState(false)
+
+    const handleDownload = async (fmt: "png" | "jpg") => {
+        if (!cardRef.current) return
+        setFmtOpen(false)
+        setDownloading(true)
+        try {
+            await downloadChartElement(cardRef.current, chart.title || "chart", fmt)
+        } finally {
+            setDownloading(false)
+        }
+    }
 
     const style: React.CSSProperties = {
         transform: CSS.Transform.toString(transform),
@@ -161,38 +188,77 @@ function SortableChartCard({ chart, onRemove }: { chart: ChartInstance; onRemove
     return (
         <div ref={setNodeRef} style={style} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 flex flex-col min-h-[300px] group/card relative shadow-sm hover:shadow-md transition-shadow">
             {/* Card header */}
-            <div className="flex items-center gap-2 mb-4 shrink-0">
-                {/* Drag handle */}
-                <button
-                    {...attributes}
-                    {...listeners}
-                    className="cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 transition-colors touch-none"
-                    title="Drag to reorder"
-                >
-                    <GripVertical className="size-4" />
-                </button>
+            <div ref={cardRef} className="flex flex-col flex-1 min-h-0">
+                <div className="flex items-center gap-2 mb-4 shrink-0">
+                    {/* Drag handle */}
+                    <button
+                        {...attributes}
+                        {...listeners}
+                        className="cursor-grab active:cursor-grabbing text-zinc-300 hover:text-zinc-500 transition-colors touch-none"
+                        title="Drag to reorder"
+                    >
+                        <GripVertical className="size-4" />
+                    </button>
 
-                <p className="flex-1 text-[12px] font-semibold text-zinc-800 dark:text-zinc-200 leading-tight pr-1 truncate">
-                    {chart.title}
-                </p>
+                    <p className="flex-1 text-[12px] font-semibold text-zinc-800 dark:text-zinc-200 leading-tight pr-1 truncate">
+                        {chart.title}
+                    </p>
 
-                <span className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 bg-zinc-50 dark:bg-zinc-800 px-2 py-0.5 rounded-full border border-zinc-100 dark:border-zinc-700 shrink-0">
-                    {chart.type}
-                </span>
+                    <span className="text-[9px] font-bold uppercase tracking-wider text-white bg-zinc-600 dark:bg-zinc-500 px-2 py-0.5 rounded-full shrink-0">
+                        {chart.type}
+                    </span>
 
-                {/* Remove button */}
-                <button
-                    onClick={() => onRemove(chart.instanceId)}
-                    className="size-5 rounded-md flex items-center justify-center text-zinc-300 hover:bg-red-50 hover:text-red-500 transition-colors shrink-0"
-                    title="Remove chart"
-                >
-                    <X className="size-3.5" />
-                </button>
-            </div>
+                    {/* Download button */}
+                    <div className="relative shrink-0">
+                        <div className="flex items-center rounded-md overflow-hidden border border-zinc-100 dark:border-zinc-700 transition-opacity">
+                            <button
+                                onClick={() => handleDownload("png")}
+                                disabled={downloading}
+                                className="flex items-center gap-1 px-1.5 py-0.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-40"
+                                title="Download PNG"
+                            >
+                                {downloading
+                                    ? <Loader2 className="size-3 animate-spin" />
+                                    : <Download className="size-3" />}
+                            </button>
+                            <div className="w-px h-3.5 bg-zinc-100 dark:bg-zinc-700" />
+                            <button
+                                onClick={() => setFmtOpen((v) => !v)}
+                                className="px-1 py-0.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                title="Choose format"
+                            >
+                                <ChevronDown className="size-3" />
+                            </button>
+                        </div>
+                        {fmtOpen && (
+                            <div className="absolute right-0 top-full mt-1 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-lg z-30 overflow-hidden w-20">
+                                {(["png", "jpg"] as const).map((fmt) => (
+                                    <button
+                                        key={fmt}
+                                        onClick={() => handleDownload(fmt)}
+                                        className="w-full px-3 py-1.5 text-left text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 uppercase tracking-wide transition-colors"
+                                    >
+                                        {fmt}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
-            {/* Chart body */}
-            <div className="flex-1 min-h-0">
-                <ChartBody chart={chart} />
+                    {/* Remove button */}
+                    <button
+                        onClick={() => onRemove(chart.instanceId)}
+                        className="size-5 rounded-md flex items-center justify-center text-red-500 bg-red-50 dark:bg-red-950/40 transition-colors shrink-0"
+                        title="Remove chart"
+                    >
+                        <X className="size-3.5" />
+                    </button>
+                </div>
+
+                {/* Chart body */}
+                <div className="flex-1 min-h-0">
+                    <ChartBody chart={chart} />
+                </div>
             </div>
         </div>
     )
@@ -200,7 +266,15 @@ function SortableChartCard({ chart, onRemove }: { chart: ChartInstance; onRemove
 
 // ── Chart body switcher ────────────────────────────────────────────────────────
 
-function ChartBody({ chart }: { chart: ChartInstance }) {
+export type ChartLike = {
+    type: string
+    title: string
+    x_axis?: { field: string; label: string } | null
+    y_axis?: { field: string; label: string } | null
+    data: Record<string, unknown>[]
+}
+
+export function ChartBody({ chart }: { chart: ChartLike }) {
     const xField = chart.x_axis?.field ?? ""
     const yField = chart.y_axis?.field ?? ""
     const xLabel = chart.x_axis?.label ?? xField

@@ -1,14 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { Send, Sparkles, User, AlertCircle, ChevronRight, Mic, MicOff } from "lucide-react"
+import { Streamdown } from "streamdown"
+import { Send, Sparkles, User, AlertCircle, ChevronRight, Mic, MicOff, Volume2, Square } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 const INSURANCE_SUGGESTIONS = [
     "Show average claims per insurer",
     "Compare revenue by quarter",
-    "Top 10 insurers by pending claims",
+    "Top 5 insurere in pie graph",
 ]
 
 const GENERIC_SUGGESTIONS = [
@@ -46,14 +48,26 @@ type Props = {
     datasetId: string | null
 }
 
-export function NarrowChat({ onQuery, datasetId }: Props) {
+export interface NarrowChatHandle {
+    populate: (text: string) => void
+}
+
+export const NarrowChat = React.forwardRef<NarrowChatHandle, Props>(function NarrowChat({ onQuery, datasetId }, ref) {
     const [messages, setMessages] = React.useState<Message[]>(() => getInitialMessages(datasetId === null))
     const [input, setInput] = React.useState("")
     const [isTyping, setIsTyping] = React.useState(false)
     const [isListening, setIsListening] = React.useState(false)
+    const [speakingId, setSpeakingId] = React.useState<number | null>(null)
     const bottomRef = React.useRef<HTMLDivElement>(null)
     const textareaRef = React.useRef<HTMLTextAreaElement>(null)
     const recognitionRef = React.useRef<any>(null)
+
+    React.useImperativeHandle(ref, () => ({
+        populate: (text: string) => {
+            setInput(text)
+            textareaRef.current?.focus()
+        },
+    }))
 
     // Reset chat when dataset changes
     React.useEffect(() => {
@@ -94,6 +108,22 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
             setIsListening(true)
             recognitionRef.current?.start()
         }
+    }
+
+    const speakMessage = (id: number, text: string) => {
+        if (!("speechSynthesis" in window)) return
+        if (speakingId === id) {
+            window.speechSynthesis.cancel()
+            setSpeakingId(null)
+            return
+        }
+        window.speechSynthesis.cancel()
+        const plain = text.replace(/[#*_`~>\[\]]/g, "").replace(/\n+/g, " ").trim()
+        const utterance = new SpeechSynthesisUtterance(plain)
+        utterance.onend = () => setSpeakingId(null)
+        utterance.onerror = () => setSpeakingId(null)
+        setSpeakingId(id)
+        window.speechSynthesis.speak(utterance)
     }
 
     // Auto-resize textarea
@@ -143,8 +173,8 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
             {/* Header */}
             <div className="h-9 border-b border-border flex items-center justify-between px-3 shrink-0">
                 <div className="flex items-center gap-2">
-                    <Sparkles className="size-3.5 text-emerald-600" />
-                    <span className="text-xs font-semibold text-foreground">Tathya Assistant</span>
+                    <Image src="/brand/logo.png" alt="Tathya" width={20} height={20} />
+                    <span className="text-xs font-semibold text-foreground">Tathya Copilot</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                     <div className="size-1.5 bg-emerald-500 rounded-full animate-pulse" />
@@ -183,15 +213,33 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
                                         <span>{m.text}</span>
                                     </div>
                                 ) : (
-                                    <div
-                                        className={cn(
-                                            "max-w-[85%] rounded-xl px-3 py-2 text-[12px] leading-relaxed",
-                                            m.role === "assistant"
-                                                ? "bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
-                                                : "bg-foreground text-background"
+                                    <div className={cn("max-w-[85%] flex flex-col gap-1", m.role === "assistant" && "group/bubble")}>
+                                        <div
+                                            className={cn(
+                                                "rounded-xl px-3 py-2 text-[12px] leading-relaxed",
+                                                m.role === "assistant"
+                                                    ? "bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300"
+                                                    : "bg-foreground text-background"
+                                            )}
+                                        >
+                                            {m.role === "assistant" ? <Streamdown>{m.text}</Streamdown> : m.text}
+                                        </div>
+                                        {m.role === "assistant" && (
+                                            <button
+                                                onClick={() => speakMessage(m.id, m.text)}
+                                                className={cn(
+                                                    "self-start flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-md transition-colors",
+                                                    speakingId === m.id
+                                                        ? "text-emerald-600 dark:text-emerald-400"
+                                                        : "text-zinc-400 dark:text-zinc-500 opacity-0 group-hover/bubble:opacity-100 hover:text-zinc-600 dark:hover:text-zinc-300"
+                                                )}
+                                            >
+                                                {speakingId === m.id
+                                                    ? <><Square className="size-2.5 fill-current" /> Stop</>
+                                                    : <><Volume2 className="size-2.5" /> Read aloud</>
+                                                }
+                                            </button>
                                         )}
-                                    >
-                                        {m.text}
                                     </div>
                                 )}
                             </div>
@@ -202,7 +250,7 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
                                     {m.suggestions.map((s) => (
                                         <button
                                             key={s}
-                                            onClick={() => sendMessage(s)}
+                                            onClick={() => { setInput(s); textareaRef.current?.focus() }}
                                             className="cursor-pointer flex items-center gap-1.5 text-left text-[11px] text-zinc-500 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors group"
                                         >
                                             <ChevronRight className="size-3 shrink-0 group-hover:translate-x-0.5 transition-transform" />
@@ -233,7 +281,7 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
             </ScrollArea>
 
             {/* Input */}
-            <div className="px-4 pt-3 pb-6 border-t border-border bg-background">
+            <div className="px-4 p-2 border-t border-border bg-background">
                 <div className="flex items-end gap-2 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-xl p-2.5 focus-within:border-zinc-400 dark:focus-within:border-zinc-500 transition-colors">
                     <textarea
                         ref={textareaRef}
@@ -247,16 +295,19 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
                         }}
                         placeholder="Describe your dashboard..."
                         rows={1}
-                        className="flex-1 bg-transparent text-[12px] text-foreground placeholder:text-muted-foreground outline-none resize-none min-h-[20px] max-h-[120px]"
+                        className="flex-1 mb-1 bg-transparent text-[12px] text-foreground placeholder:text-muted-foreground outline-none resize-none min-h-[20px] max-h-[120px]"
                     />
-                    <div className="flex items-center gap-1 mb-0.5">
+                    <div className="flex items-center gap-1">
                         <button
                             onClick={toggleListening}
+                            disabled={isTyping}
                             className={cn(
                                 "size-7 rounded-lg flex items-center justify-center transition-colors shrink-0",
-                                isListening
-                                    ? "bg-red-500 text-white animate-pulse"
-                                    : "text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                                isTyping
+                                    ? "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                                    : isListening
+                                        ? "bg-red-500 text-white animate-pulse"
+                                        : "text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                             )}
                         >
                             {isListening ? <MicOff className="size-3.5" /> : <Mic className="size-3.5" />}
@@ -270,11 +321,10 @@ export function NarrowChat({ onQuery, datasetId }: Props) {
                         </button>
                     </div>
                 </div>
-                <p className="text-center text-[9px] text-muted-foreground mt-2.5">
+                <p className="text-center text-[10px] text-muted-foreground mt-2">
                     Press Enter to send · Shift+Enter for new line
                 </p>
             </div>
         </div>
     )
-}
-
+})

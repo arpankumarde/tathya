@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/navbar";
 import { ArrowRight, BarChart3, MessageSquare, Zap, CheckCircle2 } from "lucide-react";
@@ -173,9 +174,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
               <div className="col-span-2 md:col-span-1 space-y-4">
                 <div className="flex items-center gap-2">
-                  <div className="size-5 bg-[#2f8d46] rounded flex items-center justify-center">
-                    <div className="size-1.5 bg-white rounded-full" />
-                  </div>
+                  <Image src="/brand/logo.png" alt="Tathya" width={24} height={24} className="rounded" />
                   <span className="font-bold text-lg text-[#212121]">Tathya</span>
                 </div>
                 <p className="text-sm text-zinc-500 max-w-xs">Building the future of conversational BI. Insights for everyone, everywhere.</p>

@@ -8,6 +8,7 @@ class QueryRequest(BaseModel):
     session_id: str | None = None
     dataset_id: str | None = None
     conversation_history: list[dict] = []
+    user_id: str | None = None
 
 
 # --- Schema models ---
@@ -69,3 +70,16 @@ class QueryResponse(BaseModel):
     summary: str = ""
     follow_up_suggestions: list[str] = []
     error: str | None = None
+
+
+# --- Publish / Showcase ---
+
+class PublishRequest(BaseModel):
+    user_id: str | None = None
+    dataset_id: str | None = None
+    dashboard_name: str = "Untitled Dashboard"
+    charts: list[dict] = []
+
+
+class PublishResponse(BaseModel):
+    showcase_id: str

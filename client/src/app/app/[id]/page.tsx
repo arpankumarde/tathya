@@ -3,13 +3,18 @@
 import * as React from "react"
 import { RibbonToolbar } from "@/components/ribbon-toolbar"
 import { DashboardCanvas } from "@/components/dashboard-canvas"
-import { NarrowChat } from "@/components/narrow-chat"
+import { NarrowChat, type NarrowChatHandle } from "@/components/narrow-chat"
+import { ArrowLeft } from "lucide-react"
 import { postQuery, type ChartConfig } from "@/lib/query-api"
+import { publishDashboard } from "@/lib/publish-api"
+import { auth } from "@/lib/firebase"
+import { onAuthStateChanged, User } from "firebase/auth"
+import { useEffect, useState } from "react"
 
 const INSURANCE_SUGGESTIONS = [
-    "Show average claims per insurer",
-    "Compare revenue by quarter",
+    "Top 5 insurers by amount in pie graph",
     "Top 10 insurers by pending claims",
+    "Describe the dataset"
 ]
 
 const GENERIC_SUGGESTIONS = [
@@ -23,6 +28,13 @@ export type ChartInstance = ChartConfig & { instanceId: string }
 
 export default function AppPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = React.use(params)
+    const [user, setUser] = React.useState<User | null>(null)
+    useEffect(() => {
+        const unsub = onAuthStateChanged(auth, (u) => {
+            setUser(u)
+        })
+        return unsub
+    }, [])
     const [chartInstances, setChartInstances] = React.useState<ChartInstance[]>([])
     const [sessionId, setSessionId] = React.useState<string | undefined>(undefined)
     const [isLoading, setIsLoading] = React.useState(false)
@@ -31,6 +43,8 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
 
     const [dashboardName, setDashboardName] = React.useState("Untitled Dashboard")
     const [datasetId, setDatasetId] = React.useState<string | null>(null)
+    const [isPreview, setIsPreview] = React.useState(false)
+    const chatRef = React.useRef<NarrowChatHandle>(null)
 
     // When datasetId changes, reset session so charts use the new data source
     const prevDatasetRef = React.useRef<string | null>(null)
@@ -50,7 +64,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
     }> => {
         setIsLoading(true)
         try {
-            const result = await postQuery({ query, session_id: sessionId, dataset_id: datasetId ?? undefined })
+            const result = await postQuery({ query, session_id: sessionId, dataset_id: datasetId ?? undefined, user_id: user?.uid })
             if (result.success) {
                 // Accumulate: append new charts to existing ones
                 const newInstances: ChartInstance[] = result.charts.map((c) => ({
@@ -74,7 +88,7 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
         } finally {
             setIsLoading(false)
         }
-    }, [sessionId, datasetId])
+    }, [sessionId, datasetId, user?.uid])
 
     const removeChart = React.useCallback((instanceId: string) => {
         setChartInstances((prev) => prev.filter((c) => c.instanceId !== instanceId))
@@ -84,7 +98,43 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
         setChartInstances(newOrder)
     }, [])
 
+    const handlePublish = React.useCallback(async () => {
+        return publishDashboard({
+            user_id: user?.uid,
+            dataset_id: datasetId,
+            dashboard_name: dashboardName,
+            charts: chartInstances,
+        })
+    }, [user, datasetId, dashboardName, chartInstances])
+
     const activeSuggestions = datasetId === null ? INSURANCE_SUGGESTIONS : GENERIC_SUGGESTIONS
+
+    if (isPreview) {
+        return (
+            <div className="h-screen w-screen overflow-hidden flex flex-col bg-background text-foreground">
+                <div className="h-9 border-b border-border bg-background flex items-center justify-between px-4 shrink-0">
+                    <span className="text-sm font-bold text-foreground truncate">{dashboardName || "Untitled Dashboard"}</span>
+                    <button
+                        onClick={() => setIsPreview(false)}
+                        className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors shrink-0"
+                    >
+                        <ArrowLeft className="size-3.5" />
+                        Exit Preview
+                    </button>
+                </div>
+                <DashboardCanvas
+                    charts={chartInstances}
+                    summary={summary}
+                    isLoading={isLoading}
+                    columns={columns}
+                    onRemove={removeChart}
+                    onReorder={reorderCharts}
+                    suggestions={activeSuggestions}
+                    onSuggestionClick={() => {}}
+                />
+            </div>
+        )
+    }
 
     return (
         <div className="h-screen w-screen overflow-hidden flex bg-background text-foreground">
@@ -96,6 +146,9 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
                     onNameChange={setDashboardName}
                     datasetId={datasetId}
                     onDatasetChange={setDatasetId}
+                    onPublish={handlePublish}
+                    hasCharts={chartInstances.length > 0}
+                    onPreview={() => setIsPreview(true)}
                 />
                 <DashboardCanvas
                     charts={chartInstances}
@@ -105,10 +158,10 @@ export default function AppPage({ params }: { params: Promise<{ id: string }> })
                     onRemove={removeChart}
                     onReorder={reorderCharts}
                     suggestions={activeSuggestions}
-                    onSuggestionClick={(q) => { handleQuery(q) }}
+                    onSuggestionClick={(q) => { chatRef.current?.populate(q) }}
                 />
             </div>
-            <NarrowChat onQuery={handleQuery} datasetId={datasetId} />
+            <NarrowChat ref={chatRef} onQuery={handleQuery} datasetId={datasetId} />
         </div>
     )
 }

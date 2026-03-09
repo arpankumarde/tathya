@@ -35,13 +35,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from api.publish import router as publish_router
 from api.query import router as query_router
 from api.schema import router as schema_router
 from api.upload import router as upload_router
+from api.user import router as user_router
 
 app.include_router(query_router, prefix="/api")
 app.include_router(schema_router, prefix="/api")
 app.include_router(upload_router, prefix="/api")
+app.include_router(user_router, prefix="/api")
+app.include_router(publish_router, prefix="/api")
 
 
 @app.get("/")

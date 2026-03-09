@@ -25,6 +25,7 @@ export type QueryResponse = {
 
 export type QueryRequest = {
     query: string
+    user_id?: string
     session_id?: string
     dataset_id?: string
     conversation_history?: { role: string; content: string }[]

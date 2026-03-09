@@ -24,9 +24,10 @@ export type UploadResponse = {
  * Upload a CSV file to the server.
  * Returns the server response including the dataset_id.
  */
-export async function uploadDataset(file: File): Promise<UploadResponse> {
+export async function uploadDataset(file: File, userId?: string): Promise<UploadResponse> {
     const form = new FormData()
     form.append("file", file)
+    if (userId) form.append("user_id", userId)
 
     const res = await fetch(`${API_BASE}/api/upload`, {
         method: "POST",

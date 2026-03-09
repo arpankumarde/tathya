@@ -14,7 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NextJs Starter Kit",
+  title:
+    "Tathya - Conversational AI for Instant Business Intelligence Dashboards",
+  description:
+    "Tathya turns your natural language questions into powerful, interactive data dashboards. No SQL, no technical hurdles, just instant insights.",
+  icons: "/brand/logo.png",
 };
 
 export default function RootLayout({
