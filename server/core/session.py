@@ -1,9 +1,8 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from core.database import get_db
 
-SESSION_TTL = timedelta(hours=1)
 MAX_HISTORY = 20  # messages (10 exchanges)
 
 # In-memory store for uploaded dataset paths (not persisted — files are local)
@@ -25,10 +24,7 @@ async def get_or_create_session(session_id: str | None, user_id: str | None = No
     doc = await col.find_one({"_id": sid})
 
     if doc:
-        if (
-            _now() - doc["last_accessed"].replace(tzinfo=timezone.utc) > SESSION_TTL
-            and not doc.get("conversation_history")
-        ):
+        if not doc.get("conversation_history"):
             await col.delete_one({"_id": sid})
             doc = None
 
@@ -36,6 +32,7 @@ async def get_or_create_session(session_id: str | None, user_id: str | None = No
         doc = {
             "_id": sid,
             "conversation_history": [],
+            "charts": [],
             "active_dataset": None,
             "user_id": user_id,
             "created_at": _now(),
@@ -67,6 +64,13 @@ async def add_turn(session_id: str, query: str, summary: str):
     await col.update_one(
         {"_id": session_id},
         {"$set": {"conversation_history": history, "last_accessed": _now()}},
+    )
+
+
+async def update_charts(session_id: str, charts: list[dict]):
+    await _sessions().update_one(
+        {"_id": session_id},
+        {"$set": {"charts": charts}},
     )
 
 

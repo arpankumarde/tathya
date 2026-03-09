@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 from api.schema import build_schema, schema_to_json
 from core.models import ChartConfig, QueryRequest, QueryResponse
-from core.session import add_turn, get_dataset_path, get_or_create_session
+from core.session import add_turn, get_dataset_path, get_or_create_session, update_charts
 from services import llm, query_executor, sqlite_executor
 
 router = APIRouter()
@@ -66,12 +66,14 @@ async def _handle_mongodb_query(request: QueryRequest, session: dict) -> QueryRe
         return QueryResponse(success=False, session_id=sid, error=f"Database query failed: {e}")
 
     summary = llm_response.get("summary", "")
+    charts = _build_charts(llm_response.get("charts", []), results)
     await add_turn(sid, request.query, summary)
+    await update_charts(sid, [c.model_dump() for c in charts])
 
     return QueryResponse(
         success=True,
         session_id=sid,
-        charts=_build_charts(llm_response.get("charts", []), results),
+        charts=charts,
         summary=summary,
         follow_up_suggestions=llm_response.get("follow_up_suggestions", []),
     )
@@ -115,12 +117,14 @@ async def _handle_sqlite_query(request: QueryRequest, session: dict, db_path: st
         return QueryResponse(success=False, session_id=sid, error=f"Dataset query failed: {e}")
 
     summary = llm_response.get("summary", "")
+    charts = _build_charts(llm_response.get("charts", []), results)
     await add_turn(sid, request.query, summary)
+    await update_charts(sid, [c.model_dump() for c in charts])
 
     return QueryResponse(
         success=True,
         session_id=sid,
-        charts=_build_charts(llm_response.get("charts", []), results),
+        charts=charts,
         summary=summary,
         follow_up_suggestions=llm_response.get("follow_up_suggestions", []),
     )
