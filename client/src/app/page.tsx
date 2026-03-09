@@ -2,7 +2,21 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Navbar } from "@/components/navbar";
-import { ArrowRight, BarChart3, MessageSquare, Zap, CheckCircle2 } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  MessageSquare,
+  Zap,
+  CheckCircle2,
+  Database,
+  Layers,
+  Github,
+  Twitter,
+  Linkedin,
+  Upload,
+  Sparkles,
+  LayoutDashboard,
+} from "lucide-react";
 
 export default function LandingPage() {
   return (
@@ -10,8 +24,9 @@ export default function LandingPage() {
       <Navbar />
 
       <main className="pt-16">
-        {/* Hero Section */}
-        <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto border-b border-zinc-50">
+
+        {/* ── HERO (unchanged) ── */}
+        <section className="px-6 py-24 md:py-32 max-w-6xl mx-auto border-b border-zinc-100">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="text-left space-y-8">
               <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-[#212121] leading-tight">
@@ -75,147 +90,298 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <p className="text-xs font-bold text-zinc-400 uppercase tracking-wide">Live Prompt</p>
-                  <p className="text-sm font-semibold text-[#212121]">"Show monthly revenue trends"</p>
+                  <p className="text-sm font-semibold text-[#212121]">&quot;Show monthly revenue trends&quot;</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="px-6 py-24 bg-white">
-          <div className="max-w-6xl mx-auto">
+        {/* ── FEATURES ── */}
+        <section id="features" className="relative bg-white overflow-hidden">
+          {/* Subtle top radial green wash */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(47,141,70,0.06) 0%, transparent 70%)",
+            }}
+          />
+          {/* Dot texture */}
+          <div
+            className="absolute inset-0 pointer-events-none opacity-[0.5]"
+            style={{
+              backgroundImage: "radial-gradient(circle, #e4e4e7 1px, transparent 1px)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+
+          <div className="relative max-w-6xl mx-auto px-6 py-28">
             <div className="text-center mb-20 space-y-4">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#212121]">Built for speed and clarity</h2>
-              <p className="text-lg text-zinc-500 max-w-2xl mx-auto">Transform raw data into meaningful visual stories with tools designed for functional excellence.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-xl hover:bg-white hover:shadow-xl transition-all duration-300 group">
-                <div className="mb-6 inline-flex size-12 items-center justify-center rounded-lg border border-zinc-100 bg-white shadow-sm group-hover:bg-[#2f8d46] transition-colors">
-                  <MessageSquare className="size-6 text-[#2f8d46] group-hover:text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-[#212121]">Conversational AI Interface</h3>
-                <p className="text-zinc-600 leading-relaxed text-sm">
-                  Describe what you need in plain English. Tathya understands context and builds tailored visualizations instantly.
-                </p>
-              </div>
-              <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-xl hover:bg-white hover:shadow-xl transition-all duration-300 group">
-                <div className="mb-6 inline-flex size-12 items-center justify-center rounded-lg border border-zinc-100 bg-white shadow-sm group-hover:bg-[#2f8d46] transition-colors">
-                  <Zap className="size-6 text-[#2f8d46] group-hover:text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-[#212121]">Predictive Data Insights</h3>
-                <p className="text-zinc-600 leading-relaxed text-sm">
-                  Uncover trends before they happen. Our AI engine scans your datasets for anomalies and growth opportunities automatically.
-                </p>
-              </div>
-              <div className="p-8 bg-zinc-50 border border-zinc-100 rounded-xl hover:bg-white hover:shadow-xl transition-all duration-300 group">
-                <div className="mb-6 inline-flex size-12 items-center justify-center rounded-lg border border-zinc-100 bg-white shadow-sm group-hover:bg-[#2f8d46] transition-colors">
-                  <BarChart3 className="size-6 text-[#2f8d46] group-hover:text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-3 text-[#212121]">Interactive Visuals</h3>
-                <p className="text-zinc-600 leading-relaxed text-sm">
-                  Every chart is a conversation. Drill down, filter, and explore your data points with beautiful, lightning-fast interactivity.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* How It Works */}
-        <section id="how-it-works" className="px-6 py-24 bg-zinc-50 border-t border-zinc-100">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-16 text-[#212121]">How it works</h2>
-            <div className="space-y-12">
-              <div className="flex flex-col md:flex-row items-center gap-8 text-left">
-                <div className="size-12 bg-[#2f8d46] text-white rounded-full flex items-center justify-center font-bold text-xl shrink-0">1</div>
-                <div>
-                  <h4 className="text-xl font-bold mb-2">Connect your data</h4>
-                  <p className="text-zinc-600">Securely link your databases, spreadsheets, or cloud storage. We support PostgreSQL, MySQL, CSV, and more.</p>
-                </div>
-              </div>
-              <div className="flex flex-col md:flex-row items-center gap-8 text-left">
-                <div className="size-12 bg-[#2f8d46] text-white rounded-full flex items-center justify-center font-bold text-xl shrink-0">2</div>
-                <div>
-                  <h4 className="text-xl font-bold mb-2">Ask a question</h4>
-                  <p className="text-zinc-600">Type a query like "What was our quarterly growth across Asian markets?" and let our AI handle the rest.</p>
-                </div>
-              </div>
-              <div className="flex flex-col md:flex-row items-center gap-8 text-left">
-                <div className="size-12 bg-[#2f8d46] text-white rounded-full flex items-center justify-center font-bold text-xl shrink-0">3</div>
-                <div>
-                  <h4 className="text-xl font-bold mb-2">Build your dashboard</h4>
-                  <p className="text-zinc-600">Save your visualizations to a custom dashboard. Share insights with your team with a single click.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="px-6 py-24 bg-white">
-          <div className="max-w-5xl mx-auto bg-[#2f8d46] rounded-2xl p-12 md:p-20 text-center text-white shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mr-20 -mt-20 size-80 bg-white/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 size-80 bg-black/10 rounded-full blur-3xl" />
-            <div className="relative z-10 space-y-8">
-              <h2 className="text-4xl md:text-5xl font-bold">Ready to master your data?</h2>
-              <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto">Join thousands of data-driven teams who use Tathya to simplify their business intelligence.</p>
-              <Link href="/signup" className="inline-block">
-                <Button className="bg-white hover:bg-zinc-100 text-[#2f8d46] font-extrabold h-14 px-10 rounded-lg text-lg transition-transform hover:scale-105 shadow-lg">
-                  Get Started Now
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Footer */}
-        <footer className="px-6 py-16 border-t border-zinc-100 bg-white">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-12 mb-12">
-              <div className="col-span-2 md:col-span-1 space-y-4">
-                <div className="flex items-center gap-2">
-                  <Image src="/brand/logo.png" alt="Tathya" width={24} height={24} className="rounded" />
-                  <span className="font-bold text-lg text-[#212121]">Tathya</span>
-                </div>
-                <p className="text-sm text-zinc-500 max-w-xs">Building the future of conversational BI. Insights for everyone, everywhere.</p>
-              </div>
-              <div className="space-y-4">
-                <h5 className="font-bold text-sm uppercase tracking-wider text-zinc-400">Product</h5>
-                <ul className="space-y-2 text-sm text-zinc-600">
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Features</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Pricing</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Integrations</Link></li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h5 className="font-bold text-sm uppercase tracking-wider text-zinc-400">Company</h5>
-                <ul className="space-y-2 text-sm text-zinc-600">
-                  <li><Link href="#" className="hover:text-[#2f8d46]">About</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Blog</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Careers</Link></li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h5 className="font-bold text-sm uppercase tracking-wider text-zinc-400">Support</h5>
-                <ul className="space-y-2 text-sm text-zinc-600">
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Docs</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">Contact</Link></li>
-                  <li><Link href="#" className="hover:text-[#2f8d46]">API Status</Link></li>
-                </ul>
-              </div>
-            </div>
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6 pt-12 border-t border-zinc-50">
-              <p className="text-zinc-400 text-xs">
-                © {new Date().getFullYear()} Tathya BI. All rights reserved. Professional Grade Analytics.
+              <span className="inline-block px-3 py-1 rounded-full bg-[#2f8d46]/10 text-[#2f8d46] text-xs font-bold uppercase tracking-widest border border-[#2f8d46]/20">
+                Features
+              </span>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-[#111] tracking-tight">
+                Built for speed and clarity
+              </h2>
+              <p className="text-zinc-500 text-lg max-w-2xl mx-auto leading-relaxed">
+                Transform raw data into meaningful visual stories with tools designed for functional excellence.
               </p>
-              <div className="flex gap-8">
-                <Link href="#" className="text-zinc-500 hover:text-[#2f8d46] text-xs transition-colors">Privacy Policy</Link>
-                <Link href="#" className="text-zinc-500 hover:text-[#2f8d46] text-xs transition-colors">Terms of Service</Link>
-                <Link href="#" className="text-zinc-500 hover:text-[#2f8d46] text-xs transition-colors">Cookies</Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  icon: <MessageSquare className="size-5" />,
+                  title: "Conversational AI Interface",
+                  desc: "Describe what you need in plain English. Tathya understands context and builds tailored visualizations instantly.",
+                },
+                {
+                  icon: <Zap className="size-5" />,
+                  title: "Predictive Data Insights",
+                  desc: "Uncover trends before they happen. Our AI engine scans your datasets for anomalies and growth opportunities automatically.",
+                },
+                {
+                  icon: <BarChart3 className="size-5" />,
+                  title: "Interactive Visuals",
+                  desc: "Every chart is a conversation. Drill down, filter, and explore your data points with beautiful, lightning-fast interactivity.",
+                },
+                {
+                  icon: <Database className="size-5" />,
+                  title: "Bring Your Own Data",
+                  desc: "Upload any CSV or connect your cloud storage. Works with what you already have — zero migration needed.",
+                },
+                {
+                  icon: <Layers className="size-5" />,
+                  title: "Multi-Dataset Analysis",
+                  desc: "Cross-reference multiple datasets in a single query. Combine sales, marketing, and ops data for unified insights.",
+                },
+                {
+                  icon: <LayoutDashboard className="size-5" />,
+                  title: "Persistent Dashboards",
+                  desc: "Save any report as a reusable dashboard. Share with teammates via a link — no accounts required for viewers.",
+                },
+              ].map((f, i) => (
+                <div
+                  key={i}
+                  className="group bg-white border border-zinc-200/70 rounded-2xl p-7 shadow-sm hover:shadow-xl hover:shadow-[#2f8d46]/8 hover:border-[#2f8d46]/30 hover:-translate-y-1 transition-all duration-300"
+                >
+                  <div className="mb-5 inline-flex size-11 items-center justify-center rounded-xl bg-[#2f8d46]/10 border border-[#2f8d46]/15 text-[#2f8d46] group-hover:bg-[#2f8d46] group-hover:text-white group-hover:border-[#2f8d46] transition-all duration-300 shadow-sm">
+                    {f.icon}
+                  </div>
+                  <h3 className="text-[15px] font-bold text-[#111] mb-2 leading-snug">{f.title}</h3>
+                  <p className="text-zinc-500 text-sm leading-relaxed">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── HOW IT WORKS ── */}
+        <section id="how-it-works" className="relative bg-[#f8faf8] border-t border-zinc-100 overflow-hidden">
+          {/* Subtle right-side wash */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 70% at 100% 50%, rgba(47,141,70,0.05) 0%, transparent 60%)",
+            }}
+          />
+
+          <div className="relative max-w-5xl mx-auto px-6 py-28">
+            <div className="text-center mb-20 space-y-4">
+              <span className="inline-block px-3 py-1 rounded-full bg-[#2f8d46]/10 text-[#2f8d46] text-xs font-bold uppercase tracking-widest border border-[#2f8d46]/20">
+                How it works
+              </span>
+              <h2 className="text-3xl md:text-5xl font-extrabold text-[#111] tracking-tight">
+                Three steps to insights
+              </h2>
+            </div>
+
+            <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Connector line (desktop only) */}
+              <div className="hidden md:block absolute top-9 left-[calc(16.66%+1.5rem)] right-[calc(16.66%+1.5rem)] h-px bg-gradient-to-r from-[#2f8d46]/30 via-[#2f8d46]/60 to-[#2f8d46]/30" />
+
+              {[
+                {
+                  step: "01",
+                  icon: <Upload className="size-5" />,
+                  title: "Connect your data",
+                  desc: "Securely upload CSVs or link your databases. PostgreSQL, MySQL, spreadsheets — your data stays private.",
+                },
+                {
+                  step: "02",
+                  icon: <Sparkles className="size-5" />,
+                  title: "Ask a question",
+                  desc: "Type any business question in plain English and let our AI generate the exact charts and tables you need.",
+                },
+                {
+                  step: "03",
+                  icon: <LayoutDashboard className="size-5" />,
+                  title: "Build your dashboard",
+                  desc: "Save reports to a live dashboard. Share with your team instantly — no engineering effort required.",
+                },
+              ].map((item, i) => (
+                <div key={i} className="group flex flex-col items-center text-center gap-5">
+                  {/* Step circle */}
+                  <div className="relative z-10 size-[72px] rounded-2xl bg-white border-2 border-[#2f8d46]/25 shadow-lg shadow-[#2f8d46]/10 flex flex-col items-center justify-center group-hover:bg-[#2f8d46] group-hover:border-[#2f8d46] group-hover:shadow-[#2f8d46]/25 transition-all duration-300">
+                    <span className="text-[10px] font-black text-[#2f8d46] group-hover:text-white/70 tracking-[0.15em] leading-none mb-0.5">{item.step}</span>
+                    <span className="text-[#2f8d46] group-hover:text-white transition-colors">{item.icon}</span>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-[#111] mb-2">{item.title}</h4>
+                    <p className="text-zinc-500 text-sm leading-relaxed max-w-xs mx-auto">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── CTA ── */}
+        <section className="relative bg-white overflow-hidden">
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "radial-gradient(ellipse 60% 50% at 50% 100%, rgba(47,141,70,0.07) 0%, transparent 70%)",
+            }}
+          />
+
+          <div className="relative max-w-5xl mx-auto px-6 py-28">
+            <div className="relative bg-gradient-to-br from-[#2f8d46] to-[#1e6b30] rounded-3xl p-12 md:p-20 text-center text-white shadow-2xl shadow-[#2f8d46]/20 overflow-hidden">
+              {/* Decorative circles */}
+              <div className="absolute top-0 right-0 -mr-24 -mt-24 size-96 bg-white/[0.06] rounded-full" />
+              <div className="absolute bottom-0 left-0 -ml-24 -mb-24 size-96 bg-black/[0.08] rounded-full" />
+              {/* Dot pattern overlay */}
+              <div
+                className="absolute inset-0 opacity-[0.07] pointer-events-none"
+                style={{
+                  backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
+
+              <div className="relative z-10 space-y-7">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 border border-white/20 text-white/90 text-xs font-bold uppercase tracking-widest">
+                  <span className="size-1.5 rounded-full bg-emerald-300 animate-pulse" />
+                  Get started today
+                </div>
+                <h2 className="text-4xl md:text-5xl font-extrabold leading-tight tracking-tight">
+                  Ready to master<br />your data?
+                </h2>
+                <p className="text-white/75 text-lg max-w-xl mx-auto leading-relaxed">
+                  Join data-driven teams who use Tathya to simplify their business intelligence — no engineers required.
+                </p>
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                  <Link href="/signup">
+                    <button className="flex items-center gap-2 h-13 px-9 bg-white text-[#2f8d46] font-extrabold text-base rounded-xl hover:bg-zinc-50 shadow-xl hover:shadow-2xl hover:scale-[1.03] transition-all duration-200 active:scale-[0.98] py-3.5">
+                      Get Started for Free
+                      <ArrowRight className="size-4" />
+                    </button>
+                  </Link>
+                  <Link href="#features">
+                    <button className="h-13 px-9 bg-white/10 hover:bg-white/20 border border-white/25 text-white font-semibold text-base rounded-xl transition-all duration-200 py-3.5">
+                      See Features
+                    </button>
+                  </Link>
+                </div>
+                <p className="text-white/50 text-sm flex items-center justify-center gap-1.5">
+                  <CheckCircle2 className="size-3.5" />
+                  No credit card required · 14-day free trial
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FOOTER ── */}
+        <footer className="bg-white border-t border-zinc-100">
+          <div className="max-w-6xl mx-auto px-6 pt-16 pb-10">
+
+            {/* Top grid */}
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-14">
+
+              {/* Brand column */}
+              <div className="col-span-2 space-y-5">
+                <div className="flex items-center gap-2.5">
+                  <Image src="/brand/logo.png" alt="Tathya" width={28} height={28} className="rounded-lg" />
+                  <span className="font-extrabold text-xl text-[#111]">Tathya</span>
+                </div>
+                <p className="text-sm text-zinc-500 leading-relaxed max-w-xs">
+                  The AI-powered conversational BI platform. Instant insights from your data — no SQL, no waiting.
+                </p>
+                {/* Social */}
+                <div className="flex items-center gap-2.5">
+                  {[
+                    { icon: <Github className="size-4" />, label: "GitHub" },
+                    { icon: <Twitter className="size-4" />, label: "Twitter" },
+                    { icon: <Linkedin className="size-4" />, label: "LinkedIn" },
+                  ].map((s) => (
+                    <Link
+                      key={s.label}
+                      href="#"
+                      aria-label={s.label}
+                      className="size-9 rounded-xl bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-500 hover:bg-[#2f8d46]/10 hover:border-[#2f8d46]/30 hover:text-[#2f8d46] transition-all"
+                    >
+                      {s.icon}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Link columns */}
+              {[
+                {
+                  heading: "Product",
+                  links: ["Features", "Pricing", "Integrations", "Changelog"],
+                },
+                {
+                  heading: "Company",
+                  links: ["About", "Blog", "Careers", "Press Kit"],
+                },
+                {
+                  heading: "Support",
+                  links: ["Documentation", "Contact Us", "API Status", "Community"],
+                },
+              ].map((col) => (
+                <div key={col.heading} className="space-y-4">
+                  <h5 className="text-[11px] font-bold text-zinc-400 uppercase tracking-widest">{col.heading}</h5>
+                  <ul className="space-y-2.5">
+                    {col.links.map((l) => (
+                      <li key={l}>
+                        <Link href="#" className="text-sm text-zinc-600 hover:text-[#2f8d46] transition-colors">
+                          {l}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+
+            {/* Status pill */}
+            <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 border border-emerald-100 w-fit mb-10">
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs font-semibold text-emerald-700">All systems operational</span>
+            </div>
+
+            {/* Bottom bar */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-zinc-100">
+              <p className="text-xs text-zinc-400">
+                © {new Date().getFullYear()} Tathya BI, Inc. · All rights reserved.
+              </p>
+              <div className="flex flex-wrap gap-6">
+                {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((l) => (
+                  <Link key={l} href="#" className="text-xs text-zinc-400 hover:text-[#2f8d46] transition-colors">
+                    {l}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
         </footer>
+
       </main>
     </div>
   );
