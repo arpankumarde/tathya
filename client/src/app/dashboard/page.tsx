@@ -25,7 +25,7 @@ import {
     removeStoredDataset,
     type UploadedDataset,
 } from "@/lib/upload-api"
-import { getUserRecent, type RecentConversation } from "@/lib/user-api"
+import { getUserRecent, RecentDataset, type RecentConversation } from "@/lib/user-api"
 import { auth } from "@/lib/firebase"
 import { onAuthStateChanged, type User } from "firebase/auth"
 
