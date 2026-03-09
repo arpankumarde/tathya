@@ -1,0 +1,40 @@
+server {
+    listen 80;
+    server_name tathya.obvix.cloud;
+
+    # Frontend
+    location / {
+        proxy_pass http://127.0.0.1:3007;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+}
+
+server {
+    listen 80;
+    server_name tathya.api.obvix.cloud;
+
+    # Backend API
+    location / {
+        proxy_pass http://127.0.0.1:8007;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # SSE / streaming support
+        proxy_set_header Connection '';
+        proxy_buffering off;
+        proxy_cache off;
+        chunked_transfer_encoding on;
+
+        # Long-running requests
+        proxy_read_timeout 300s;
+    }
+}
